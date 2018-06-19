@@ -3,15 +3,18 @@ Tendermoney
 The tendermoney will be a blockchain to exchange money, where each money is represented by only one public key.
 On the transaction the money will change ownership by changing the public key.
 The money can have only these values 500, 100, 50, 20, 10, 5, 2, 1, 50c, 20c,10c, 5c, 2c and 1c, called constant values.
-There will be 5 types of transactions: inflate, sum, devide, send, receive.
+There will be 5 types of transactions: inflate, sum, devide, tax, send, receive.
 - inflate: this action will inflate the number of money that will be in circulation.
   Only the inflators can use this action.
 - sum: this action will sum the constant value of coins, to get a new coin based on the constant values.
   For example, two coins of value 10 will get 20. However, adding 10 and 5, will not create a coin with the value 15.
   The uuids of the previous coins will be destroyed and no one can use them.
-- devide: this action will devide the constant value of a coin, to get new coins based on the constant values.
+- divide: this action will devide the constant value of a coin, to get new coins based on the constant values.
   For example, one coin of value 10 will be two coins of 5.
   The uuids of the previous coin will be destroyed and no one can use it.
+- tax: this action will tell what is the fee of the transactions in percentage.
+  Only the inflators can add it. 
+  Only the latest tax will be used for the transactions after it.
 - send: this action will put the public keys of the coins into one and sign the list coins' UUIDs, a sha256 hash of the list
   and a shared signature (that signes the hash). 
   The validator will wait for the receiver to give the other shared signature to validate the transaction.
@@ -49,6 +52,22 @@ Response:
   - The coin is empty
   - The owner is not in the list of the inflators
 
+- Tax
+Request:
+{
+    Type: TAX
+    Signature: hex
+    Data: {
+        Percentage: int
+        Inflator: public_key_hex
+    }
+}
+Response:
+  The request will fail on these scenarios:
+  - The percentage is a negative number
+  - The percentage is over 100
+  - The signature does not validate the inflator
+
 - Sum
 Request:
 {
@@ -70,10 +89,10 @@ Response:
   - The NewOwner is empty
   - The NewOwner exists already
 
-- Devide
+- Divide
 Request:
 {
-    Type: DEVIDE
+    Type: DIVIDE
     Signature: hex
     Data: {
         Coin: uuid 
@@ -159,6 +178,14 @@ Response:
     Coin: uuid
 }
 
+- Get latest tax
+Request:
+Path: /tax
+Response:
+{
+    Percentage: int
+}
+
 - Get the public keys from the validator for the fee
 Request:
 {
@@ -177,4 +204,3 @@ Failed scenarios
  - The coins do not validate the signature
  - The date passed one minute
 
- 
