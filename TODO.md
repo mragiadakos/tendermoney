@@ -33,24 +33,24 @@ Actions API:
 Request:
 {
     Type: INFLATE
-    CoinSignature: hex
-    InflatorSignature: hex
+    Signature: hex
     Data: {
         Coin: uuid
-        Value: integer
-        Unit: fraction | currency
+        Value: Float
         Owner: public key in hex
         Inflator: public key
     }
 }
 Response:
   The request will fail on these scenarios:
-  - Value is not in the list of contant values
-  - The unit is not "fraction" or "currency"
-  - The inflator does not validate the signature
-  - The coin does not validate the signature
-  - The coin is empty
-  - The owner is not in the list of the inflators
+  - Value is not in the list of contant values (d)
+  - The coin is empty (d)
+  - The owner is empty (d)
+  - The inflator is empty (d)
+  - The owner is not in the list of the inflators (d)
+  - The coin's public key with the inflator's public key does not validate the signature (d)
+  - The coin exists already (d)
+  - The public key exists already (d)
 
 - Tax
 Request:

@@ -1,5 +1,5 @@
-hash: b36d7ba264e70de6e9ff18b19c10993c9df3e1d37d39e481230b944d6aaab08d
-updated: 2018-06-19T23:13:23.005790393+03:00
+hash: e3ecb0a891f04ebb1d29f64b4f72c176c7e5160790d99acfa6308728fe83520c
+updated: 2018-06-20T21:54:15.160273492+03:00
 imports:
 - name: github.com/agl/ed25519
   version: 5312a61534124124185d41f09206b9fef1d88403
@@ -10,8 +10,17 @@ imports:
   version: 86fed781132ac890ee03e906e4ecd5d6fa180c64
   subpackages:
   - btcec
+- name: github.com/dedis/fixbuf
+  version: 290118f838f79dd2f76edf7a98cccf989eaf3310
 - name: github.com/dedis/kyber
   version: d66a5d4741ce71cd06dbb413844fc1661f5faf37
+  subpackages:
+  - group/edwards25519
+  - group/internal/marshalling
+  - group/mod
+  - util/key
+  - util/random
+  - xof/blake2xb
 - name: github.com/go-kit/kit
   version: ca4112baa34cb55091301bdc13b1420a122b1b9e
   subpackages:
@@ -137,6 +146,7 @@ imports:
 - name: golang.org/x/crypto
   version: ab813273cd59e1333f7ae7bff5d027d4aadf528c
   subpackages:
+  - blake2b
   - blake2s
   - sha3
 - name: golang.org/x/net
@@ -193,6 +203,14 @@ imports:
   - tap
   - transport
 testImports:
+- name: github.com/davecgh/go-spew
+  version: 346938d642f2ec3594ed81d874461961cd0faa76
+  subpackages:
+  - spew
+- name: github.com/pmezard/go-difflib
+  version: 792786c7400a136282c1664665ae0a8db921c6c2
+  subpackages:
+  - difflib
 - name: github.com/stretchr/testify
   version: 12b6f73e6084dad08a7c6e575284b177ecafbc71
   subpackages:
