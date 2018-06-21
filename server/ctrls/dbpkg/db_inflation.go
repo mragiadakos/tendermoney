@@ -3,8 +3,6 @@ package dbpkg
 import (
 	"encoding/json"
 	"errors"
-
-	"github.com/mragiadakos/tendermoney/server/ctrls/models"
 )
 
 var (
@@ -13,8 +11,19 @@ var (
 )
 
 var (
-	ERR_COIN_EXISTS_ALREADY  = errors.New("The coin exists already.")
-	ERR_OWNER_EXISTS_ALREADY = errors.New("The owner exists already.")
+	ERR_COIN_EXISTS_ALREADY = func(uuid string) error {
+		return errors.New("The coin " + uuid + " exists already.")
+	}
+	ERR_COIN_DOES_NOT_EXISTS = func(uuid string) error {
+		return errors.New("The coin " + uuid + " does not exists.")
+	}
+
+	ERR_OWNER_EXISTS_ALREADY = func(pub string) error {
+		return errors.New("The owner " + pub + " exists already.")
+	}
+	ERR_OWNER_DOES_NOT_EXISTS = func(pub string) error {
+		return errors.New("The owner " + pub + " does not exists.")
+	}
 )
 
 func prefixCoin(uuid string) []byte {
@@ -27,17 +36,53 @@ func prefixOwner(pub string) []byte {
 	return append(ownerKey, b...)
 }
 
-func (s *State) AddCoin(id *models.InflationData) error {
-	has := s.db.Has(prefixCoin(id.Coin))
+type StateCoin struct {
+	Coin  string
+	Owner string
+	Value float64
+}
+
+func (s *State) AddCoin(sc StateCoin) error {
+	has := s.db.Has(prefixCoin(sc.Coin))
 	if has {
-		return ERR_COIN_EXISTS_ALREADY
+		return ERR_COIN_EXISTS_ALREADY(sc.Coin)
 	}
-	has = s.db.Has(prefixOwner(id.Owner))
+	has = s.db.Has(prefixOwner(sc.Owner))
 	if has {
-		return ERR_OWNER_EXISTS_ALREADY
+		return ERR_OWNER_EXISTS_ALREADY(sc.Owner)
 	}
-	b, _ := json.Marshal(id)
-	s.db.Set(prefixCoin(id.Coin), b)
-	s.db.Set(prefixOwner(id.Owner), []byte(id.Coin))
+
+	b, _ := json.Marshal(sc)
+	s.db.Set(prefixCoin(sc.Coin), b)
+	s.db.Set(prefixOwner(sc.Owner), []byte(sc.Coin))
 	return nil
+}
+
+func (s *State) GetCoin(uuid string) (*StateCoin, error) {
+	has := s.db.Has(prefixCoin(uuid))
+	if !has {
+		return nil, ERR_COIN_DOES_NOT_EXISTS(uuid)
+	}
+	sc := new(StateCoin)
+	b := s.db.Get(prefixCoin(uuid))
+	json.Unmarshal(b, &sc)
+	return sc, nil
+}
+
+func (s *State) DeleteCoinAndOwner(uuid string) {
+	sc, err := s.GetCoin(uuid)
+	if err != nil {
+		return
+	}
+	s.db.Delete(prefixCoin(uuid))
+	s.db.Delete(prefixOwner(sc.Owner))
+}
+
+func (s *State) GetOwner(pubHex string) (string, error) {
+	has := s.db.Has(prefixOwner(pubHex))
+	if !has {
+		return "", ERR_OWNER_DOES_NOT_EXISTS(pubHex)
+	}
+	b := s.db.Get(prefixOwner(pubHex))
+	return string(b), nil
 }

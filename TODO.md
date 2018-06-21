@@ -15,6 +15,7 @@ There will be 5 types of transactions: inflate, sum, devide, tax, send, receive.
 - tax: this action will tell what is the fee of the transactions in percentage.
   Only the inflators can add it. 
   Only the latest tax will be used for the transactions after it.
+  If the tax is lower than the constant value, then the inflator can choose the lowest value from the constant valued
 - send: this action will put the public keys of the coins into one and sign the list coins' UUIDs, a sha256 hash of the list
   and a shared signature (that signes the hash). 
   The validator will wait for the receiver to give the other shared signature to validate the transaction.
@@ -52,22 +53,6 @@ Response:
   - The coin exists already (d)
   - The public key exists already (d)
 
-- Tax
-Request:
-{
-    Type: TAX
-    Signature: hex
-    Data: {
-        Percentage: int
-        Inflator: public_key_hex
-    }
-}
-Response:
-  The request will fail on these scenarios:
-  - The percentage is a negative number
-  - The percentage is over 100
-  - The signature does not validate the inflator
-
 - Sum
 Request:
 {
@@ -81,13 +66,16 @@ Request:
 }
 Response:
   The request will fail on these scenarios:
-  - The list of coins is empty.
-  - A coin does not have an owner.
-  - The list of public keys based on the coins, does not validate the signature
-  - NewCoin is empty
-  - NewCoin exists already
-  - The NewOwner is empty
-  - The NewOwner exists already
+  - The list of coins is empty. (d)
+  - NewCoin is empty. (d)
+  - The NewOwner is empty (d)
+  - The sum of coins is not equal to a constant value (d)
+  - A coin does not exists. (d)
+  - The NewCoin exists already (d)
+  - The NewOwner exists already (d)
+  - The list of public keys based on the coins, does not validate the signature (d)
+  Success:
+  - The new coin is the database with the owner and the old one coins and owners are not in (d)
 
 - Divide
 Request:
@@ -107,6 +95,25 @@ Response:
  - The sum of values is not equal the value of the coin
  - A coin from the new coins, exists already
  - An owner from the new owners, exists already
+
+- Tax
+Request:
+{
+    Type: TAX
+    Signature: hex
+    Data: {
+        Percentage: int
+        Inflator: public_key_hex
+        FixedValue: int
+    }
+}
+Response:
+  The request will fail on these scenarios:
+  - The percentage is a negative number
+  - The fixed value is a negative number
+  - The percentage is over 100
+  - The signature does not validate the inflator
+
 
 - Send
 Request:

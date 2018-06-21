@@ -4,6 +4,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 
+	"github.com/mragiadakos/tendermoney/server/ctrls/dbpkg"
+
 	"github.com/mragiadakos/tendermoney/server/ctrls/models"
 	"github.com/mragiadakos/tendermoney/server/ctrls/validations"
 	"github.com/tendermint/abci/types"
@@ -26,7 +28,35 @@ func (app *TMApplication) DeliverTx(tx []byte) types.ResponseDeliverTx {
 		if err != nil {
 			return types.ResponseDeliverTx{Code: code, Log: err.Error()}
 		}
-		err = app.state.AddCoin(&id)
+		sc := dbpkg.StateCoin{}
+		sc.Coin = id.Coin
+		sc.Owner = id.Owner
+		sc.Value = id.Value
+		err = app.state.AddCoin(sc)
+		if err != nil {
+			return types.ResponseDeliverTx{Code: models.CodeTypeUnauthorized, Log: err.Error()}
+		}
+	case models.SUM:
+		sd := dts.GetSumData()
+		code, err := validations.ValidateSum(&app.state, sd, sigB)
+		if err != nil {
+			return types.ResponseDeliverTx{Code: code, Log: err.Error()}
+		}
+		sum := 0.0
+		for _, v := range sd.Coins {
+			sc, err := app.state.GetCoin(v)
+			if err != nil {
+				return types.ResponseDeliverTx{Code: models.CodeTypeUnauthorized, Log: err.Error()}
+			}
+			sum += sc.Value
+			app.state.DeleteCoinAndOwner(v)
+		}
+
+		sc := dbpkg.StateCoin{}
+		sc.Coin = sd.NewCoin
+		sc.Owner = sd.NewOwner
+		sc.Value = sum
+		err = app.state.AddCoin(sc)
 		if err != nil {
 			return types.ResponseDeliverTx{Code: models.CodeTypeUnauthorized, Log: err.Error()}
 		}

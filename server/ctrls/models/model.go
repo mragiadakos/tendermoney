@@ -4,8 +4,11 @@ import "encoding/json"
 
 type DeliveryType string
 
+var CONSTANT_VALUES = []float64{500, 100, 50, 20, 10, 5, 2, 1, 0.50, 0.20, 0.10, 0.05, 0.02, 0.01}
+
 const (
 	INFLATE = DeliveryType("inflate")
+	SUM     = DeliveryType("sum")
 	TAX     = DeliveryType("tax")
 	DIVIDE  = DeliveryType("devide")
 	SEND    = DeliveryType("send")
@@ -29,6 +32,13 @@ func (d *Delivery) GetType() DeliveryType {
 func (d *Delivery) GetInflationData() InflationData {
 	b, _ := json.Marshal(d.Data)
 	i := InflationData{}
+	json.Unmarshal(b, &i)
+	return i
+}
+
+func (d *Delivery) GetSumData() SumData {
+	b, _ := json.Marshal(d.Data)
+	i := SumData{}
 	json.Unmarshal(b, &i)
 	return i
 }

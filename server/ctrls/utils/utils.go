@@ -40,6 +40,40 @@ func Sign(priv kyber.Scalar, msg []byte) (string, error) {
 	return hex.EncodeToString(s), nil
 }
 
+func MultiSignature(privs []kyber.Scalar, msg []byte) (string, error) {
+	suite := edwards25519.NewBlakeSHA256Ed25519()
+	onePrivate := privs[0]
+	for i := 1; i < len(privs); i++ {
+		onePrivate = suite.Scalar().Add(onePrivate, privs[i])
+	}
+	s, err := schnorr.Sign(suite, onePrivate, msg)
+	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(s), nil
+}
+
+func MultiVerify(pubHexs []string, sig []byte, msg []byte) (bool, error) {
+	suite := edwards25519.NewBlakeSHA256Ed25519()
+	pubs := []kyber.Point{}
+	for _, v := range pubHexs {
+		kp, err := UnmarshalPublicKey(v)
+		if err != nil {
+			return false, err
+		}
+		pubs = append(pubs, kp)
+	}
+	onePublic := pubs[0]
+	for i := 1; i < len(pubs); i++ {
+		onePublic = suite.Point().Add(onePublic, pubs[i])
+	}
+	err := schnorr.Verify(suite, onePublic, msg, sig)
+	if err != nil {
+		return false, nil
+	}
+	return true, nil
+}
+
 func Verify(pubHex string, sigHex string, msg []byte) (bool, error) {
 	suite := edwards25519.NewBlakeSHA256Ed25519()
 	var pub kyber.Point

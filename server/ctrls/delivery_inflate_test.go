@@ -45,6 +45,7 @@ func TestDeliveryInflationFailOnSignatureEmpty(t *testing.T) {
 
 func TestDeliveryInflationFailOnOwnerEmpty(t *testing.T) {
 	app := NewTMApplication()
+	kp, _ := utils.CreateKeyPair()
 	di := models.Delivery{}
 	di.Type = models.INFLATE
 	di.Signature = "lalla"
@@ -52,6 +53,8 @@ func TestDeliveryInflationFailOnOwnerEmpty(t *testing.T) {
 	data.Coin = uuid.NewV4().String()
 	data.Owner = ""
 	di.Data = data
+	msg, _ := json.Marshal(di.Data)
+	di.Signature, _ = utils.Sign(kp.Private, msg)
 	b, _ := json.Marshal(di)
 	resp := app.DeliverTx(b)
 	assert.Equal(t, models.CodeTypeUnauthorized, resp.Code)
