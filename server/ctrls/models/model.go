@@ -43,6 +43,13 @@ func (d *Delivery) GetSumData() SumData {
 	return i
 }
 
+func (d *Delivery) GetDivitionData() DivitionData {
+	b, _ := json.Marshal(d.Data)
+	i := DivitionData{}
+	json.Unmarshal(b, &i)
+	return i
+}
+
 const (
 	CodeTypeOK            uint32 = 0
 	CodeTypeEncodingError uint32 = 1

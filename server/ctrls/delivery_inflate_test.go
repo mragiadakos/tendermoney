@@ -200,7 +200,7 @@ func TestDeliveryInflationFailCoinOnAlreadyExists(t *testing.T) {
 	b, _ = json.Marshal(di)
 	resp = app.DeliverTx(b)
 	assert.Equal(t, models.CodeTypeUnauthorized, resp.Code)
-	assert.Equal(t, dbpkg.ERR_COIN_EXISTS_ALREADY, errors.New(resp.Log))
+	assert.Equal(t, dbpkg.ERR_COIN_EXISTS_ALREADY(data.Coin), errors.New(resp.Log))
 }
 
 func TestDeliveryInflationFailOwnerOnAlreadyExists(t *testing.T) {
@@ -237,5 +237,5 @@ func TestDeliveryInflationFailOwnerOnAlreadyExists(t *testing.T) {
 	b, _ = json.Marshal(di)
 	resp = app.DeliverTx(b)
 	assert.Equal(t, models.CodeTypeUnauthorized, resp.Code)
-	assert.Equal(t, dbpkg.ERR_OWNER_EXISTS_ALREADY, errors.New(resp.Log))
+	assert.Equal(t, dbpkg.ERR_OWNER_EXISTS_ALREADY(data.Owner), errors.New(resp.Log))
 }

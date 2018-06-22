@@ -60,6 +60,23 @@ func (app *TMApplication) DeliverTx(tx []byte) types.ResponseDeliverTx {
 		if err != nil {
 			return types.ResponseDeliverTx{Code: models.CodeTypeUnauthorized, Log: err.Error()}
 		}
+	case models.DIVIDE:
+		dd := dts.GetDivitionData()
+		code, err := validations.ValidateDivition(&app.state, dd, sigB)
+		if err != nil {
+			return types.ResponseDeliverTx{Code: code, Log: err.Error()}
+		}
+		app.state.DeleteCoinAndOwner(dd.Coin)
+		for k, v := range dd.NewCoins {
+			sc := dbpkg.StateCoin{}
+			sc.Coin = k
+			sc.Owner = v.Owner
+			sc.Value = v.Value
+			err = app.state.AddCoin(sc)
+			if err != nil {
+				return types.ResponseDeliverTx{Code: models.CodeTypeUnauthorized, Log: err.Error()}
+			}
+		}
 	}
 	return types.ResponseDeliverTx{Code: models.CodeTypeOK}
 }

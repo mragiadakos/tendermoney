@@ -52,6 +52,8 @@ Response:
   - The coin's public key with the inflator's public key does not validate the signature (d)
   - The coin exists already (d)
   - The public key exists already (d)
+  Success
+  - The coin exists in the DB (d)
 
 - Sum
 Request:
@@ -84,17 +86,22 @@ Request:
     Signature: hex
     Data: {
         Coin: uuid 
-        NewCoins: map[uuid]{ Value: int, Owner: public_key_hex }
+        NewCoins: map[uuid]{ Value: float64, Owner: public_key_hex }
     }
 }
 Response:
  The request will fail on these scenarios:
- - The coin is empty
- - The owner of the coin does not validate the signature
- - The value of a coin is not based on the constant values
- - The sum of values is not equal the value of the coin
- - A coin from the new coins, exists already
- - An owner from the new owners, exists already
+ - The coin is empty (d)
+ - The new coins is empty (d)
+ - The owner of a new coin is empty (d)
+ - A value from the new coins, is not based on the constant values (d)
+ - The new coins have the same owner (d)
+ - The sum of new coins' values, is not equal to the value of the coin (d)
+ - A coin from the new coins, exists already (d)
+ - An owner from the new owners, exists already (d) 
+ - The owner of the coin with the new coins do not validate the signature (d)
+ Success
+ - The new coins with the owners exist in the DB and the old one does not (d)
 
 - Tax
 Request:
