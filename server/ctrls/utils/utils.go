@@ -74,22 +74,19 @@ func MultiVerify(pubHexs []string, sig []byte, msg []byte) (bool, error) {
 	return true, nil
 }
 
-func Verify(pubHex string, sigHex string, msg []byte) (bool, error) {
+func Verify(pubHex string, sig []byte, msg []byte) (bool, error) {
 	suite := edwards25519.NewBlakeSHA256Ed25519()
-	var pub kyber.Point
+	pub := suite.Point()
 	pubB, err := hex.DecodeString(pubHex)
 	if err != nil {
 		return false, errors.New("The public key is not hex: " + err.Error())
 	}
-	sigB, err := hex.DecodeString(sigHex)
-	if err != nil {
-		return false, errors.New("The signature is not hex: " + err.Error())
-	}
+
 	err = pub.UnmarshalBinary(pubB)
 	if err != nil {
 		return false, errors.New("The public key is not correct.")
 	}
-	err = schnorr.Verify(suite, pub, msg, sigB)
+	err = schnorr.Verify(suite, pub, msg, sig)
 	if err != nil {
 		return false, nil
 	}

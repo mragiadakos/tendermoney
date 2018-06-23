@@ -77,6 +77,13 @@ func (app *TMApplication) DeliverTx(tx []byte) types.ResponseDeliverTx {
 				return types.ResponseDeliverTx{Code: models.CodeTypeUnauthorized, Log: err.Error()}
 			}
 		}
+	case models.TAX:
+		td := dts.GetTaxData()
+		code, err := validations.ValidateTax(&app.state, td, sigB)
+		if err != nil {
+			return types.ResponseDeliverTx{Code: code, Log: err.Error()}
+		}
+		app.state.AddTax(td)
 	}
 	return types.ResponseDeliverTx{Code: models.CodeTypeOK}
 }

@@ -15,7 +15,7 @@ There will be 5 types of transactions: inflate, sum, devide, tax, send, receive.
 - tax: this action will tell what is the fee of the transactions in percentage.
   Only the inflators can add it. 
   Only the latest tax will be used for the transactions after it.
-  If the tax is lower than the constant value, then the inflator can choose the lowest value from the constant valued
+  If the tax is lower than the constant value, then the validator will choose the lowest value from the constant valued
 - send: this action will put the public keys of the coins into one and sign the list coins' UUIDs, a sha256 hash of the list
   and a shared signature (that signes the hash). 
   The validator will wait for the receiver to give the other shared signature to validate the transaction.
@@ -111,15 +111,22 @@ Request:
     Data: {
         Percentage: int
         Inflator: public_key_hex
-        FixedValue: int
     }
 }
 Response:
   The request will fail on these scenarios:
-  - The percentage is a negative number
-  - The fixed value is a negative number
-  - The percentage is over 100
+  - The percentage is a negative number (d)
+  - The percentage is over 100 (d)
+  - The inflator is not in the list of inflators (d)
   - The signature does not validate the inflator
+  - A method based on the tax that will return the lowest constant value fee (d)
+    Examples if tax is 23%
+    - the transaction is 1 then the fee will 0.23 (d)
+    - The transaction is 0.50 then the fee will be 0.11 (d)
+    - The transaction is 0.10 then the fee will be 0.02 (d)
+    - The transaction is 0.01 the the fee will be 0.01 (d)
+  Success
+  - The tax is saved on the DB. Save 3 taxes and expect that the last, is the one that can only be used. (d)
 
 
 - Send

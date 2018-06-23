@@ -50,6 +50,13 @@ func (d *Delivery) GetDivitionData() DivitionData {
 	return i
 }
 
+func (d *Delivery) GetTaxData() TaxData {
+	b, _ := json.Marshal(d.Data)
+	i := TaxData{}
+	json.Unmarshal(b, &i)
+	return i
+}
+
 const (
 	CodeTypeOK            uint32 = 0
 	CodeTypeEncodingError uint32 = 1
