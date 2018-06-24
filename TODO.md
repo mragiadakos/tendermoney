@@ -15,13 +15,18 @@ There will be 5 types of transactions: inflate, sum, devide, tax, send, receive.
 - tax: this action will tell what is the fee of the transactions in percentage.
   Only the inflators can add it. 
   Only the latest tax will be used for the transactions after it.
-  If the tax is lower than the constant value, then the validator will choose the lowest value from the constant valued
-- send: this action will put the public keys of the coins into one and sign the list coins' UUIDs, a sha256 hash of the list
-  and a shared signature (that signes the hash). 
-  The validator will wait for the receiver to give the other shared signature to validate the transaction.
-  The send will also contain a fee, based on the public keys the validator gave to the user.
-- receiver: this action will put the hash, the shared secret and the list of public keys based on the list of UUIDs' order and a signature 
-  from the public keys.
+  If the tax is lower than the constant value, then the validator will choose the lowest value from the constant values
+- send: this action is to send money to a person.
+  The sender will add the uuids of the coins in a list and he will create a hash based on the list.
+  Then he will use the dleq algorithm to create a proof.
+  Both the hash and the secret from the proof, will send to the receiver.
+  Also he will create a list of coins for the fee.
+  The validator will get the coins from the list, empty them from public keys and lock them for the inflator to give them new public keys.
+  The sender's signature will be based on the public keys of all the coins.
+- receive: this action will give the receiver the opportunity to create public keys for the coins.
+  He will put the hash, the verifier of the proof and the list of public keys based on the coins. 
+  From the new public keys, the receiver will create the signature
+- receive_fee: this action can only be used by the inflator, to unlock the fees and put new owners to the coins.
 
 The user can query public keys and get the UUID and the value that represents and vice versa.
 Also he can query the hash of the sender.
@@ -136,22 +141,22 @@ Request:
     Signature: hex
     Data: {
         Coins : []uuid
-        Hash: sha256 hash of the list of uuids
-        SharedSignature: hex
-        PubPoly: public key in hex
-        Fee : map[uuid]public_key_hex  
+        Proof: {
+            Proof: dleq.Proof
+            XG: kyber.Point
+            XH: kyber.Point
+        }
+        Fee : []uuid 
     }
 }
 Response:
  The request will fail on these scenarios:
  - The list of coins is empty
  - A coin from the coins and fee exists
- - The hash does not validate the coins
- - The SharedSignature is empty
  - The list of public keys, based on the coins and fee, do not validate the signature
- - The SharedSignature is empty
- - The PubPoly is empty
- - The public keys of the fee haven't submitted by the validator
+ - Fail to sum, divide or send any coin from the transaction.
+ Success:
+ - All the coins are locked and unusable for any action.
 
 - Receive
 Request:
@@ -159,9 +164,12 @@ Request:
     Type: RECEIVE
     Signature: hex
     Data: {
-        Hash: sha256 hash of the list of uuids
+        Hash: sha256 hash of the list of coins
         NewOwners: map[uuid]public_key_hex  
-        SharedSignature: hex
+        ProofVerification:{
+            G: kyber.Point
+            H: kyber.Point
+        }
     }
 }
 Response:
@@ -171,8 +179,30 @@ Response:
   - The hash has already been collected
   - The NewOwners uuids does not exist
   - The public keys are already owners
-  - The shared signature does not validate the hash with the PubPoly of the sender
+  - The coins are not in the transaction.
+  - The proof is not valid
+  Success
+  - The coins have been unlocked with new owners
 
+- Receive Fee
+Request:
+{
+  Type: RECEIVE_FEE
+  Signature: hex
+  Data:{
+    NewOwners: map[uuid]public_key_hex  
+    Inflator: public_key_hex
+  }
+}
+Response:
+  The request will fail on these scenarios:
+  - The NewOwners is empty
+  - The inflator is empty
+  - The coins are not locked
+  - The public keys of the owners exist already
+  - The signature does from both the inflator and new owners, does not validate the transaction
+  Success:
+  - The coins have the new owners and they are unlocked.
 
 
 Query API
@@ -225,3 +255,9 @@ Failed scenarios
  - The coins do not validate the signature
  - The date passed one minute
 
+
+- Get the list of uuid fees.
+Request:
+{
+    Fees: map[uuid]Coin
+}
