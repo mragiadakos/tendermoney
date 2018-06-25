@@ -23,6 +23,16 @@ func ValidateSum(s *dbpkg.State, sd models.SumData, sig []byte) (uint32, error) 
 	if len(sd.Coins) == 0 {
 		return models.CodeTypeUnauthorized, ERR_COINS_EMPTY
 	}
+
+	checkCoins := map[string]int{}
+	for _, v := range sd.Coins {
+		_, ok := checkCoins[v]
+		if ok {
+			return models.CodeTypeUnauthorized, ERR_COIN_FROM_COINS_ADDED_TWICE(v)
+		}
+		checkCoins[v] = 0
+	}
+
 	if len(sig) == 0 {
 		return models.CodeTypeUnauthorized, ERR_SIGNATURE_EMPTY
 	}
@@ -75,5 +85,16 @@ func ValidateSum(s *dbpkg.State, sd models.SumData, sig []byte) (uint32, error) 
 	if !isValid {
 		return models.CodeTypeUnauthorized, ERR_SIGNATURE_NOT_VALIDATE
 	}
+
+	for _, v := range sd.Coins {
+		isLocked, err := s.IsCoinLocked(v)
+		if err != nil {
+			return models.CodeTypeUnauthorized, err
+		}
+		if isLocked {
+			return models.CodeTypeUnauthorized, ERR_COIN_IS_LOCKED(v)
+		}
+	}
+
 	return models.CodeTypeOK, nil
 }

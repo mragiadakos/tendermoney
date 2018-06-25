@@ -57,6 +57,13 @@ func (d *Delivery) GetTaxData() TaxData {
 	return i
 }
 
+func (d *Delivery) GetSendData() SendData {
+	b, _ := json.Marshal(d.Data)
+	i := SendData{}
+	json.Unmarshal(b, &i)
+	return i
+}
+
 const (
 	CodeTypeOK            uint32 = 0
 	CodeTypeEncodingError uint32 = 1

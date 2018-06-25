@@ -37,9 +37,10 @@ func prefixOwner(pub string) []byte {
 }
 
 type StateCoin struct {
-	Coin  string
-	Owner string
-	Value float64
+	Coin     string
+	Owner    string
+	Value    float64
+	IsLocked bool
 }
 
 func (s *State) AddCoin(sc StateCoin) error {
@@ -85,4 +86,26 @@ func (s *State) GetOwner(pubHex string) (string, error) {
 	}
 	b := s.db.Get(prefixOwner(pubHex))
 	return string(b), nil
+}
+
+func (s *State) IsCoinLocked(uuid string) (bool, error) {
+	has := s.db.Has(prefixCoin(uuid))
+	if !has {
+		return false, ERR_COIN_DOES_NOT_EXISTS(uuid)
+	}
+	sc := new(StateCoin)
+	b := s.db.Get(prefixCoin(uuid))
+	json.Unmarshal(b, &sc)
+	return sc.IsLocked, nil
+}
+
+func (s *State) LockCoin(uuid string) error {
+	sc, err := s.GetCoin(uuid)
+	if err != nil {
+		return err
+	}
+	sc.IsLocked = true
+	b, _ := json.Marshal(sc)
+	s.db.Set(prefixCoin(sc.Coin), b)
+	return nil
 }

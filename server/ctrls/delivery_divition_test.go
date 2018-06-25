@@ -7,6 +7,9 @@ import (
 	"testing"
 
 	"github.com/dedis/kyber"
+	"github.com/dedis/kyber/group/edwards25519"
+	"github.com/dedis/kyber/proof/dleq"
+	"github.com/dedis/kyber/util/random"
 	"github.com/mragiadakos/tendermoney/server/ctrls/utils"
 
 	"github.com/satori/go.uuid"
@@ -324,4 +327,55 @@ func TestDeliveryDivitionSuccess(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, k, uuid)
 	}
+}
+
+func TestDeliveryDivitionFailOnLockCoin(t *testing.T) {
+	app := NewTMApplication()
+	inflatorKp, inflatorPubHex := utils.CreateKeyPair()
+	coin, oldKp := newCoin(t, app, inflatorKp, inflatorPubHex, 1)
+
+	rng := random.New()
+	suite := edwards25519.NewBlakeSHA256Ed25519()
+
+	// Create some random secrets and base points
+	x := suite.Scalar().Pick(rng)
+	g := suite.Point().Pick(rng)
+	h := suite.Point().Pick(rng)
+
+	proof, _, _, _ := dleq.NewDLEQProof(suite, g, h, x)
+
+	// transaction will lock the coins
+	transact(t, app, []string{coin}, []string{}, proof, []kyber.Scalar{oldKp.Private})
+
+	d := models.Delivery{}
+	d.Type = models.DIVIDE
+	data := models.DivitionData{}
+	data.Coin = coin
+	data.NewCoins = map[string]models.Coin{}
+
+	nc1, newCoin1PubHex := utils.CreateKeyPair()
+	data.NewCoins[uuid.NewV4().String()] = models.Coin{
+		Value: 0.50,
+		Owner: newCoin1PubHex,
+	}
+
+	nc2, newCoin2PubHex := utils.CreateKeyPair()
+	data.NewCoins[uuid.NewV4().String()] = models.Coin{
+		Value: 0.50,
+		Owner: newCoin2PubHex,
+	}
+
+	d.Data = data
+	msg, _ := json.Marshal(d.Data)
+
+	d.Data = data
+	d.Signature, _ = utils.MultiSignature(
+		[]kyber.Scalar{oldKp.Private, nc1.Private, nc2.Private},
+		msg,
+	)
+
+	b, _ := json.Marshal(d)
+	resp := app.DeliverTx(b)
+	assert.Equal(t, models.CodeTypeUnauthorized, resp.Code)
+	assert.Equal(t, validations.ERR_COIN_IS_LOCKED(coin), errors.New(resp.Log))
 }

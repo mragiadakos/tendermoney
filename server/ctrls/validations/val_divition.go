@@ -91,5 +91,13 @@ func ValidateDivition(s *dbpkg.State, dd models.DivitionData, sig []byte) (uint3
 		return models.CodeTypeUnauthorized, ERR_SIGNATURE_NOT_VALIDATE
 	}
 
+	isLocked, err := s.IsCoinLocked(dd.Coin)
+	if err != nil {
+		return models.CodeTypeUnauthorized, err
+	}
+	if isLocked {
+		return models.CodeTypeUnauthorized, ERR_COIN_IS_LOCKED(dd.Coin)
+	}
+
 	return models.CodeTypeOK, nil
 }

@@ -73,8 +73,9 @@ Request:
 }
 Response:
   The request will fail on these scenarios:
-  - The list of coins is empty. (d)
-  - NewCoin is empty. (d)
+  - The list of coins is empty (d)
+  - A coin added twice (d)
+  - NewCoin is empty (d)
   - The NewOwner is empty (d)
   - The sum of coins is not equal to a constant value (d)
   - A coin does not exists. (d)
@@ -123,7 +124,7 @@ Response:
   - The percentage is a negative number (d)
   - The percentage is over 100 (d)
   - The inflator is not in the list of inflators (d)
-  - The signature does not validate the inflator
+  - The signature does not validate the inflator (d)
   - A method based on the tax that will return the lowest constant value fee (d)
     Examples if tax is 23%
     - the transaction is 1 then the fee will 0.23 (d)
@@ -141,22 +142,29 @@ Request:
     Signature: hex
     Data: {
         Coins : []uuid
-        Proof: {
-            Proof: dleq.Proof
-            XG: kyber.Point
-            XH: kyber.Point
-        }
+        Proof:  dleq.Proof
         Fee : []uuid 
     }
 }
 Response:
  The request will fail on these scenarios:
- - The list of coins is empty
- - A coin from the coins and fee exists
- - The list of public keys, based on the coins and fee, do not validate the signature
- - Fail to sum, divide or send any coin from the transaction.
+ - The list of coins is empty (d)
+ - The list of coins from fee is empty when tax exists (d)
+ - A coin from the coins added twice (d)
+ - A coin from the fee added twice (d)
+ - A coin from the coins and fee added on both (d)
+ - A coin from the coins does not exist (d)
+ - A coin from the fee does not exist (d)
+ - The fee is not based on the tax  (d)
+ - The list of public keys, based on the coins and fee, do not validate the signature (d)
+ - The proof is not encoded correctly (d)
  Success:
- - All the coins are locked and unusable for any action.
+ - The transaction exists in the db based on the hash of coins (d)
+ - All the coins are locked and unusable for any action (d)
+   Fail to sum (d)
+   Fail to divide (d) 
+   Fail to another send (d)
+
 
 - Receive
 Request:
@@ -169,6 +177,8 @@ Request:
         ProofVerification:{
             G: kyber.Point
             H: kyber.Point
+            XG: kyber.Point
+            XH: kyber.Point
         }
     }
 }

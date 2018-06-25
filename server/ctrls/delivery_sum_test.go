@@ -9,11 +9,10 @@ import (
 	"github.com/mragiadakos/tendermoney/server/ctrls/dbpkg"
 
 	"github.com/dedis/kyber"
-
 	"github.com/dedis/kyber/group/edwards25519"
-	"github.com/dedis/kyber/util/key"
+	"github.com/dedis/kyber/proof/dleq"
+	"github.com/dedis/kyber/util/random"
 
-	"github.com/mragiadakos/tendermoney/server/confs"
 	"github.com/mragiadakos/tendermoney/server/ctrls/models"
 	"github.com/mragiadakos/tendermoney/server/ctrls/utils"
 	"github.com/mragiadakos/tendermoney/server/ctrls/validations"
@@ -31,6 +30,20 @@ func TestDeliverySumFailOnEmptyCoins(t *testing.T) {
 	resp := app.DeliverTx(b)
 	assert.Equal(t, models.CodeTypeUnauthorized, resp.Code)
 	assert.Equal(t, validations.ERR_COINS_EMPTY, errors.New(resp.Log))
+}
+
+func TestDeliverySumFailOnCoinAddedTwice(t *testing.T) {
+	app := NewTMApplication()
+	d := models.Delivery{}
+	d.Type = models.SUM
+	data := models.SumData{}
+	coin := uuid.NewV4().String()
+	data.Coins = []string{coin, coin}
+	d.Data = data
+	b, _ := json.Marshal(d)
+	resp := app.DeliverTx(b)
+	assert.Equal(t, models.CodeTypeUnauthorized, resp.Code)
+	assert.Equal(t, validations.ERR_COIN_FROM_COINS_ADDED_TWICE(coin), errors.New(resp.Log))
 }
 
 func TestDeliverySumFailOnSignatureEmpty(t *testing.T) {
@@ -77,28 +90,6 @@ func TestDeliverySumFailOnEmptyNewOwner(t *testing.T) {
 	resp := app.DeliverTx(b)
 	assert.Equal(t, models.CodeTypeUnauthorized, resp.Code)
 	assert.Equal(t, validations.ERR_NEW_OWNER_EMPTY, errors.New(resp.Log))
-}
-
-func newCoin(t *testing.T, app *TMApplication, inflatorKp *key.Pair, inflatorPubHex string, value float64) (string, *key.Pair) {
-	ownerKp, ownerPubHex := utils.CreateKeyPair()
-	d := models.Delivery{}
-	d.Type = models.INFLATE
-	data := models.InflationData{}
-	data.Coin = uuid.NewV4().String()
-	data.Owner = ownerPubHex
-	data.Inflator = inflatorPubHex
-	confs.Conf.Inflators = []string{inflatorPubHex}
-	data.Value = value
-	d.Data = data
-	msg, _ := json.Marshal(d.Data)
-
-	suite := edwards25519.NewBlakeSHA256Ed25519()
-	onePrivate := suite.Scalar().Add(inflatorKp.Private, ownerKp.Private)
-	d.Signature, _ = utils.Sign(onePrivate, msg)
-	b, _ := json.Marshal(d)
-	resp := app.DeliverTx(b)
-	assert.Equal(t, models.CodeTypeOK, resp.Code)
-	return data.Coin, ownerKp
 }
 
 func TestDeliveryOnCoinDoesNotExists(t *testing.T) {
@@ -281,4 +272,44 @@ func TestDeliverySumSuccess(t *testing.T) {
 	newCoinUuid, err := app.state.GetOwner(data.NewOwner)
 	assert.Nil(t, err)
 	assert.Equal(t, data.NewCoin, newCoinUuid)
+}
+
+func TestDeliverySumFailOnCoinLocked(t *testing.T) {
+	app := NewTMApplication()
+	inflatorKp, inflatorPubHex := utils.CreateKeyPair()
+	newOwnerKp, newOwnerPubHex := utils.CreateKeyPair()
+
+	coin1, owner1 := newCoin(t, app, inflatorKp, inflatorPubHex, 0.01)
+	coin2, owner2 := newCoin(t, app, inflatorKp, inflatorPubHex, 0.01)
+
+	rng := random.New()
+	suite := edwards25519.NewBlakeSHA256Ed25519()
+
+	// Create some random secrets and base points
+	x := suite.Scalar().Pick(rng)
+	g := suite.Point().Pick(rng)
+	h := suite.Point().Pick(rng)
+
+	proof, _, _, _ := dleq.NewDLEQProof(suite, g, h, x)
+
+	// transaction will lock the coins
+	transact(t, app, []string{coin1}, []string{}, proof, []kyber.Scalar{owner1.Private})
+
+	d := models.Delivery{}
+	d.Type = models.SUM
+	data := models.SumData{}
+	data.Coins = []string{coin1, coin2}
+	data.NewCoin = uuid.NewV4().String()
+	data.NewOwner = newOwnerPubHex
+	d.Data = data
+	msg, _ := json.Marshal(d.Data)
+	d.Signature, _ = utils.MultiSignature(
+		[]kyber.Scalar{newOwnerKp.Private, owner1.Private, owner2.Private},
+		msg,
+	)
+	b, _ := json.Marshal(d)
+	resp := app.DeliverTx(b)
+	assert.Equal(t, models.CodeTypeUnauthorized, resp.Code)
+	assert.Equal(t, validations.ERR_COIN_IS_LOCKED(coin1), errors.New(resp.Log))
+
 }

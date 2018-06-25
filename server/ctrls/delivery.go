@@ -84,6 +84,17 @@ func (app *TMApplication) DeliverTx(tx []byte) types.ResponseDeliverTx {
 			return types.ResponseDeliverTx{Code: code, Log: err.Error()}
 		}
 		app.state.AddTax(td)
+	case models.SEND:
+		sd := dts.GetSendData()
+		code, err := validations.ValidateSend(&app.state, sd, sigB)
+		if err != nil {
+			return types.ResponseDeliverTx{Code: code, Log: err.Error()}
+		}
+		app.state.AddTransaction(sd)
+		allCoins := append(sd.Coins, sd.Fee...)
+		for _, v := range allCoins {
+			app.state.LockCoin(v)
+		}
 	}
 	return types.ResponseDeliverTx{Code: models.CodeTypeOK}
 }
