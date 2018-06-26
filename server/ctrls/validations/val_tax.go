@@ -43,7 +43,7 @@ func ValidateTax(s *dbpkg.State, td models.TaxData, sig []byte) (uint32, error) 
 	}
 
 	if !isVal {
-		return models.CodeTypeUnauthorized, ERR_SIGNATURE_NOT_VALIDATE
+		return models.CodeTypeUnauthorized, ERR_SIGNATURE_NOT_VALID
 	}
 	return models.CodeTypeOK, nil
 }

@@ -7,12 +7,13 @@ type DeliveryType string
 var CONSTANT_VALUES = []float64{500, 100, 50, 20, 10, 5, 2, 1, 0.50, 0.20, 0.10, 0.05, 0.02, 0.01}
 
 const (
-	INFLATE = DeliveryType("inflate")
-	SUM     = DeliveryType("sum")
-	TAX     = DeliveryType("tax")
-	DIVIDE  = DeliveryType("devide")
-	SEND    = DeliveryType("send")
-	RECEIVE = DeliveryType("receive")
+	INFLATE      = DeliveryType("inflate")
+	SUM          = DeliveryType("sum")
+	TAX          = DeliveryType("tax")
+	DIVIDE       = DeliveryType("devide")
+	SEND         = DeliveryType("send")
+	RECEIVE      = DeliveryType("receive")
+	RETRIEVE_FEE = DeliveryType("retrieve_fee")
 )
 
 type TypeDeliveryInterface interface {
@@ -60,6 +61,13 @@ func (d *Delivery) GetTaxData() TaxData {
 func (d *Delivery) GetSendData() SendData {
 	b, _ := json.Marshal(d.Data)
 	i := SendData{}
+	json.Unmarshal(b, &i)
+	return i
+}
+
+func (d *Delivery) GetReceiveData() ReceiveData {
+	b, _ := json.Marshal(d.Data)
+	i := ReceiveData{}
 	json.Unmarshal(b, &i)
 	return i
 }

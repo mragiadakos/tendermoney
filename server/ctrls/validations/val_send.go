@@ -115,7 +115,7 @@ func ValidateSend(s *dbpkg.State, sd models.SendData, sig []byte) (uint32, error
 		return models.CodeTypeEncodingError, err
 	}
 	if !isVer {
-		return models.CodeTypeUnauthorized, ERR_SIGNATURE_NOT_VALIDATE
+		return models.CodeTypeUnauthorized, ERR_SIGNATURE_NOT_VALID
 	}
 
 	_, err = sd.Proof.GetProof()

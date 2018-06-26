@@ -15,6 +15,7 @@ import (
 	"github.com/satori/go.uuid"
 
 	"github.com/mragiadakos/tendermoney/server/confs"
+	"github.com/mragiadakos/tendermoney/server/ctrls/dbpkg"
 	"github.com/mragiadakos/tendermoney/server/ctrls/models"
 	"github.com/mragiadakos/tendermoney/server/ctrls/utils"
 	"github.com/mragiadakos/tendermoney/server/ctrls/validations"
@@ -210,7 +211,7 @@ func TestDeliverySendFailOnSignature(t *testing.T) {
 	resp := app.DeliverTx(b)
 
 	assert.Equal(t, models.CodeTypeUnauthorized, resp.Code)
-	assert.Equal(t, validations.ERR_SIGNATURE_NOT_VALIDATE, errors.New(resp.Log))
+	assert.Equal(t, validations.ERR_SIGNATURE_NOT_VALID, errors.New(resp.Log))
 }
 
 func TestDeliverySendFailOnProofNotEncodedProperly(t *testing.T) {
@@ -307,9 +308,9 @@ func TestDeliverySendSuccessful(t *testing.T) {
 	coinb, _ := json.Marshal(data.Coins)
 	hash := sha256.Sum256(coinb)
 	hashHex := hex.EncodeToString(hash[:])
-	sd, err := app.state.GetTransaction(hashHex)
+	st, err := app.state.GetTransaction(hashHex)
 	assert.Nil(t, err)
-	assert.Equal(t, &data, sd)
+	assert.Equal(t, &dbpkg.StateTransaction{SendData: data}, st)
 }
 
 func TestDeliverySendFailOnUsingLockedCoin(t *testing.T) {

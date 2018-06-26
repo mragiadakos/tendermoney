@@ -83,7 +83,7 @@ func ValidateSum(s *dbpkg.State, sd models.SumData, sig []byte) (uint32, error) 
 		return models.CodeTypeUnauthorized, err
 	}
 	if !isValid {
-		return models.CodeTypeUnauthorized, ERR_SIGNATURE_NOT_VALIDATE
+		return models.CodeTypeUnauthorized, ERR_SIGNATURE_NOT_VALID
 	}
 
 	for _, v := range sd.Coins {

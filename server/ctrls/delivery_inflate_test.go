@@ -139,7 +139,7 @@ func TestDeliveryInflationFailOnSignature(t *testing.T) {
 	b, _ := json.Marshal(di)
 	resp := app.DeliverTx(b)
 	assert.Equal(t, models.CodeTypeUnauthorized, resp.Code)
-	assert.Equal(t, validations.ERR_SIGNATURE_NOT_VALIDATE, errors.New(resp.Log))
+	assert.Equal(t, validations.ERR_SIGNATURE_NOT_VALID, errors.New(resp.Log))
 }
 
 func TestDeliveryInflationSuccessOnSignature(t *testing.T) {

@@ -23,8 +23,16 @@ func prefixTransaction(hashHex string) []byte {
 	return append(transactionKey, []byte(hashHex)...)
 }
 
+type StateTransaction struct {
+	models.SendData
+	IsCoinsReceived bool // the coins retrieved by the receiver
+	IsFeeReceived   bool // the fee retrieved by the inflator
+}
+
 func (s *State) AddTransaction(sd models.SendData) error {
-	sdb, _ := json.Marshal(sd)
+	st := StateTransaction{}
+	st.SendData = sd
+	sdb, _ := json.Marshal(st)
 	coinb, _ := json.Marshal(sd.Coins)
 	hash := sha256.Sum256(coinb)
 	hashHex := hex.EncodeToString(hash[:])
@@ -32,13 +40,24 @@ func (s *State) AddTransaction(sd models.SendData) error {
 	return nil
 }
 
-func (s *State) GetTransaction(hash string) (*models.SendData, error) {
+func (s *State) GetTransaction(hash string) (*StateTransaction, error) {
 	has := s.db.Has(prefixTransaction(hash))
 	if !has {
 		return nil, ERR_TRANSACTION_NOT_EXIST(hash)
 	}
 	b := s.db.Get(prefixTransaction(hash))
-	sd := new(models.SendData)
-	json.Unmarshal(b, &sd)
-	return sd, nil
+	st := new(StateTransaction)
+	json.Unmarshal(b, &st)
+	return st, nil
+}
+
+func (s *State) CoinsReceivedFromTransaction(hash string) error {
+	st, err := s.GetTransaction(hash)
+	if err != nil {
+		return err
+	}
+	st.IsCoinsReceived = true
+	stb, _ := json.Marshal(st)
+	s.db.Set(prefixTransaction(hash), stb)
+	return nil
 }

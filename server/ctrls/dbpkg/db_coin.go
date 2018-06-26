@@ -88,6 +88,27 @@ func (s *State) GetOwner(pubHex string) (string, error) {
 	return string(b), nil
 }
 
+func (s *State) DeleteOwner(pubHex string) error {
+	has := s.db.Has(prefixOwner(pubHex))
+	if !has {
+		return ERR_OWNER_DOES_NOT_EXISTS(pubHex)
+	}
+	s.db.Delete(prefixOwner(pubHex))
+	return nil
+}
+
+func (s *State) SetNewOwner(uuid, owner string) error {
+	sc, err := s.GetCoin(uuid)
+	if err != nil {
+		return err
+	}
+	sc.Owner = owner
+	b, _ := json.Marshal(sc)
+	s.db.Set(prefixCoin(sc.Coin), b)
+	s.db.Set(prefixOwner(sc.Owner), []byte(sc.Coin))
+	return nil
+}
+
 func (s *State) IsCoinLocked(uuid string) (bool, error) {
 	has := s.db.Has(prefixCoin(uuid))
 	if !has {
@@ -105,6 +126,17 @@ func (s *State) LockCoin(uuid string) error {
 		return err
 	}
 	sc.IsLocked = true
+	b, _ := json.Marshal(sc)
+	s.db.Set(prefixCoin(sc.Coin), b)
+	return nil
+}
+
+func (s *State) UnlockCoin(uuid string) error {
+	sc, err := s.GetCoin(uuid)
+	if err != nil {
+		return err
+	}
+	sc.IsLocked = false
 	b, _ := json.Marshal(sc)
 	s.db.Set(prefixCoin(sc.Coin), b)
 	return nil

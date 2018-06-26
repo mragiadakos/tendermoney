@@ -26,7 +26,7 @@ There will be 5 types of transactions: inflate, sum, devide, tax, send, receive.
 - receive: this action will give the receiver the opportunity to create public keys for the coins.
   He will put the hash, the verifier of the proof and the list of public keys based on the coins. 
   From the new public keys, the receiver will create the signature
-- receive_fee: this action can only be used by the inflator, to unlock the fees and put new owners to the coins.
+- retrieve_fee: this action can only be used by the inflator, to unlock the fees and put new owners to the coins.
 
 The user can query public keys and get the UUID and the value that represents and vice versa.
 Also he can query the hash of the sender.
@@ -172,7 +172,7 @@ Request:
     Type: RECEIVE
     Signature: hex
     Data: {
-        Hash: sha256 hash of the list of coins
+        TransactionHash: sha256 hash, in hex, of the list of coins
         NewOwners: map[uuid]public_key_hex  
         ProofVerification:{
             G: kyber.Point
@@ -184,22 +184,27 @@ Request:
 }
 Response:
   The request will fail on these scenarios:
-  - The hash is empty
-  - The hash does not exist from a sender
-  - The hash has already been collected
-  - The NewOwners uuids does not exist
-  - The public keys are already owners
-  - The coins are not in the transaction.
-  - The proof is not valid
+  - The hash is empty (d)
+  - The hash does not exist (d)
+  - The coins are not in the transaction. (d)
+  - The new owners are already owners (d)
+  - The proof is not correct (d)
+  - The proof is not valid (d)
+  - The signature does not validate based on the new owners (d)
+  - Can not receive the coins twice (d)
   Success
-  - The coins have been unlocked with new owners
+  - The coins have been unlocked (d)
+  - The coins have new owners (d)
+  - The older owners have been removed (d)
+  - The transaction's has been received (d)
 
-- Receive Fee
+- Retrieve Fee
 Request:
 {
-  Type: RECEIVE_FEE
+  Type: RETRIEVE_FEE
   Signature: hex
   Data:{
+    TransactionHash: sha256 hash, in hex, of the list of coins
     NewOwners: map[uuid]public_key_hex  
     Inflator: public_key_hex
   }

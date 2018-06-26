@@ -12,13 +12,13 @@ import (
 )
 
 var (
-	ERR_COIN_EMPTY             = errors.New("The coin is empty.")
-	ERR_SIGNATURE_EMPTY        = errors.New("The signature is empty.")
-	ERR_OWNER_EMPTY            = errors.New("The owner's public key is empty.")
-	ERR_INFLATOR_EMPTY         = errors.New("The inflator's public key is empty.")
-	ERR_INFLATOR_NOT_IN_LIST   = errors.New("The inflator not in the list of inflators.")
-	ERR_VALUE_NOT_IN_LIST      = errors.New("The value not in the list of constant values.")
-	ERR_SIGNATURE_NOT_VALIDATE = errors.New("The public keys do not validate the signature.")
+	ERR_COIN_EMPTY           = errors.New("The coin is empty.")
+	ERR_SIGNATURE_EMPTY      = errors.New("The signature is empty.")
+	ERR_OWNER_EMPTY          = errors.New("The owner's public key is empty.")
+	ERR_INFLATOR_EMPTY       = errors.New("The inflator's public key is empty.")
+	ERR_INFLATOR_NOT_IN_LIST = errors.New("The inflator not in the list of inflators.")
+	ERR_VALUE_NOT_IN_LIST    = errors.New("The value not in the list of constant values.")
+	ERR_SIGNATURE_NOT_VALID  = errors.New("The public keys do not validate the signature.")
 )
 
 func ValidateInflation(id models.InflationData, sig []byte) (uint32, error) {
@@ -71,7 +71,7 @@ func ValidateInflation(id models.InflationData, sig []byte) (uint32, error) {
 	msg, _ := json.Marshal(id)
 	err = schnorr.Verify(suite, onePublic, msg, sig)
 	if err != nil {
-		return models.CodeTypeUnauthorized, ERR_SIGNATURE_NOT_VALIDATE
+		return models.CodeTypeUnauthorized, ERR_SIGNATURE_NOT_VALID
 	}
 	return models.CodeTypeOK, nil
 }

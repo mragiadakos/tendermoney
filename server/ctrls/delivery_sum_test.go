@@ -218,7 +218,7 @@ func TestDeliverySumFailOnSignature(t *testing.T) {
 	b, _ := json.Marshal(d)
 	resp := app.DeliverTx(b)
 	assert.Equal(t, models.CodeTypeUnauthorized, resp.Code)
-	assert.Equal(t, validations.ERR_SIGNATURE_NOT_VALIDATE, errors.New(resp.Log))
+	assert.Equal(t, validations.ERR_SIGNATURE_NOT_VALID, errors.New(resp.Log))
 }
 
 func TestDeliverySumSuccess(t *testing.T) {
