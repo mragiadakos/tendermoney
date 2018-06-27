@@ -50,6 +50,47 @@ func TestDeliveryReceiveFailOnHashDoesNotExists(t *testing.T) {
 	assert.Equal(t, validations.ERR_TRANSACTION_HASH_DOES_NOT_EXIST, errors.New(resp.Log))
 }
 
+func TestDeliveryReceiveFailOnNumberOfOwnersNotEqualToTheNumberOfCoins(t *testing.T) {
+	app := NewTMApplication()
+
+	inflatorKp, inflatorPubHex := utils.CreateKeyPair()
+	_, newOwnerPubHex := utils.CreateKeyPair()
+
+	confs.Conf.Inflators = []string{inflatorPubHex}
+
+	coin1, coin1Kp := newCoin(t, app, inflatorKp, inflatorPubHex, 1)
+	coin2, coin2Kp := newCoin(t, app, inflatorKp, inflatorPubHex, 1)
+
+	rng := random.New()
+	suite := edwards25519.NewBlakeSHA256Ed25519()
+
+	// Create some random secrets and base points
+	x := suite.Scalar().Pick(rng)
+	g := suite.Point().Pick(rng)
+	h := suite.Point().Pick(rng)
+
+	coins := []string{coin1, coin2}
+	proof, _, _, _ := dleq.NewDLEQProof(suite, g, h, x)
+	transact(t, app, coins, []string{}, proof, []kyber.Scalar{coin1Kp.Private, coin2Kp.Private})
+
+	msg, _ := json.Marshal(coins)
+	hash := sha256.Sum256(msg)
+	hashHex := hex.EncodeToString(hash[:])
+
+	d := models.Delivery{}
+	d.Type = models.RECEIVE
+	data := models.ReceiveData{}
+	data.TransactionHash = hashHex
+	data.NewOwners = map[string]string{}
+	data.NewOwners[coin1] = newOwnerPubHex
+	d.Data = data
+	b, _ := json.Marshal(d)
+	resp := app.DeliverTx(b)
+
+	assert.Equal(t, models.CodeTypeUnauthorized, resp.Code)
+	assert.Equal(t, validations.ERR_NEW_OWNERS_NOT_EQUAL_TO_COINS, errors.New(resp.Log))
+}
+
 func TestDeliveryReceiveFailOnCoinDoesNotExistsInTransaction(t *testing.T) {
 	app := NewTMApplication()
 

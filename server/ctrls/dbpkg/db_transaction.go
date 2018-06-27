@@ -61,3 +61,14 @@ func (s *State) CoinsReceivedFromTransaction(hash string) error {
 	s.db.Set(prefixTransaction(hash), stb)
 	return nil
 }
+
+func (s *State) FeeRetrievedFromTransaction(hash string) error {
+	st, err := s.GetTransaction(hash)
+	if err != nil {
+		return err
+	}
+	st.IsFeeReceived = true
+	stb, _ := json.Marshal(st)
+	s.db.Set(prefixTransaction(hash), stb)
+	return nil
+}

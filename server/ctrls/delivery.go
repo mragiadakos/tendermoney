@@ -125,6 +125,35 @@ func (app *TMApplication) DeliverTx(tx []byte) types.ResponseDeliverTx {
 			return types.ResponseDeliverTx{Code: models.CodeTypeServerError, Log: err.Error()}
 		}
 
+	case models.RETRIEVE_FEE:
+		rd := dts.GetRetrieveData()
+		code, err := validations.ValidateRetrieve(&app.state, rd, sigB)
+		if err != nil {
+			return types.ResponseDeliverTx{Code: code, Log: err.Error()}
+		}
+		err = app.state.FeeRetrievedFromTransaction(rd.TransactionHash)
+		if err != nil {
+			return types.ResponseDeliverTx{Code: models.CodeTypeServerError, Log: err.Error()}
+		}
+		for coin, newOwner := range rd.NewOwners {
+			err := app.state.UnlockCoin(coin)
+			if err != nil {
+				return types.ResponseDeliverTx{Code: models.CodeTypeServerError, Log: err.Error()}
+			}
+			sc, err := app.state.GetCoin(coin)
+			if err != nil {
+				return types.ResponseDeliverTx{Code: models.CodeTypeServerError, Log: err.Error()}
+			}
+			err = app.state.DeleteOwner(sc.Owner)
+			if err != nil {
+				return types.ResponseDeliverTx{Code: models.CodeTypeServerError, Log: err.Error()}
+			}
+			err = app.state.SetNewOwner(coin, newOwner)
+			if err != nil {
+				return types.ResponseDeliverTx{Code: models.CodeTypeServerError, Log: err.Error()}
+			}
+		}
+
 	default:
 		if err != nil {
 			return types.ResponseDeliverTx{Code: models.CodeTypeUnauthorized, Log: "This type of action does not exists."}

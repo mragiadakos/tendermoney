@@ -23,6 +23,7 @@ var (
 	ERR_PROOF_VERIFICATION_IS_NOT_CORRECT = errors.New("The proof's verification is not correct.")
 	ERR_PROOF_VERIFICATION_IS_NOT_VALID   = errors.New("The proof's verification is not valid.")
 	ERR_TRANSACTION_HAS_BEEN_RECEIVED     = errors.New("The transaction has been received.")
+	ERR_NEW_OWNERS_NOT_EQUAL_TO_COINS     = errors.New("The number of new owners is not equal to the coins.")
 )
 
 func ValidateReceive(state *dbpkg.State, rd models.ReceiveData, sig []byte) (uint32, error) {
@@ -34,6 +35,9 @@ func ValidateReceive(state *dbpkg.State, rd models.ReceiveData, sig []byte) (uin
 		return models.CodeTypeUnauthorized, ERR_TRANSACTION_HASH_DOES_NOT_EXIST
 	}
 
+	if len(rd.NewOwners) != len(tr.Coins) {
+		return models.CodeTypeUnauthorized, ERR_NEW_OWNERS_NOT_EQUAL_TO_COINS
+	}
 	for coin, owner := range rd.NewOwners {
 		isFoundCoin := false
 		for _, trCoin := range tr.Coins {

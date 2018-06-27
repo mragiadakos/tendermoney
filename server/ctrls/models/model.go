@@ -72,6 +72,13 @@ func (d *Delivery) GetReceiveData() ReceiveData {
 	return i
 }
 
+func (d *Delivery) GetRetrieveData() RetrieveData {
+	b, _ := json.Marshal(d.Data)
+	i := RetrieveData{}
+	json.Unmarshal(b, &i)
+	return i
+}
+
 const (
 	CodeTypeOK            uint32 = 0
 	CodeTypeEncodingError uint32 = 1

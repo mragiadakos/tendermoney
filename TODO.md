@@ -186,6 +186,7 @@ Response:
   The request will fail on these scenarios:
   - The hash is empty (d)
   - The hash does not exist (d)
+  - The number of new owners is not equal to the number of coins (d)
   - The coins are not in the transaction. (d)
   - The new owners are already owners (d)
   - The proof is not correct (d)
@@ -211,13 +212,20 @@ Request:
 }
 Response:
   The request will fail on these scenarios:
-  - The NewOwners is empty
-  - The inflator is empty
-  - The coins are not locked
-  - The public keys of the owners exist already
-  - The signature does from both the inflator and new owners, does not validate the transaction
+  - Transaction does not exists (d)
+  - Transaction does not have fee to retrieve (d)
+  - The NewOwners is not equal to fees (d)
+  - The inflator is empty (d)
+  - The inflator is not in the list (d)
+  - The public keys of the new owners exist already (d)
+  - A coin is not in the list of fee (d)
+  - The signature from both the inflator and new owners, does not validate the transaction (d)
+  - The transaction's fee has already been retrieved (d)
   Success:
-  - The coins have the new owners and they are unlocked.
+  - The coins have the new owners (d)
+  - The older owners have been deleted (d)
+  - the coins are unlocked. (d)
+  - the transaction is retrieved (d)
 
 
 Query API
