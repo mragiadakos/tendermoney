@@ -232,55 +232,67 @@ Query API
 
 - Get the coin of a public key
 Request:
-{
-    Coin: uuid
-}
+Path: get_coin?owner=:uuid
 Response:
   Successful:
 {
+    Coin: uuid
     Owner: public key hex
+    IsLocked: bool
+    Value: float64
 }
-The request fail if the uuid does not exists
+ The request fail if the uuid does not exists or it is empty (d)
+ The request works successfully (d)
+
 
 - Get the public key of a coin
-{
-    Owner: public key hex
-}
+Path: get_coin_by_owner?owner=:public_key_hex
 Response:
   Successful:
 {
     Coin: uuid
+    Owner: public key hex
+    IsLocked: bool
+    Value: float64
 }
+The request will fail if the public key does not exists or it is empty (d)
+The request works successfully (d)
+
 
 - Get latest tax
 Request:
-Path: /tax
+Path: get_latest_tax
 Response:
 {
     Percentage: int
+    Inflator: public key hex
 }
+The request will fail if there is not any tax (d)
+The request works successfully (d)
 
-- Get the public keys from the validator for the fee
+- Get the transaction based on the hash
 Request:
+Path: get_transaction?hash=:hash
+Response:
 {
-    Signature: hex
-    Data: {
-        Coins: []uuid
-        Date: time
-    }
+    Hash : sha256_hex
+    Coins : []uuid
+    Fee : []uuid 
+    IsFeeReceived: bool
+    IsCoinsReceived: bool
 }
-Responce:
-Successful scenarios
-{
-  Owners: map[uuid]public_key_hex
-}
-Failed scenarios
- - The coins do not validate the signature
- - The date passed one minute
+The request will fail if there is not any hash or it is not found (d)
+The request works successfully (d)
 
-
-- Get the list of uuid fees.
+- Get the transactions that fees haven't been received
 Request:
-{
-    Fees: map[uuid]Coin
+Path: get_transactions_with_unreceived_fee
+Response:
+[]{
+    Hash : sha256_hex
+    Coins : []uuid
+    Fee : []uuid 
+    IsFeeReceived: bool
+    IsCoinsReceived: bool
 }
+The request works successfully showing (d)

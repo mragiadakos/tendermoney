@@ -1,6 +1,8 @@
 package ctrls
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"testing"
 
@@ -64,5 +66,31 @@ func transact(t *testing.T, app *TMApplication, coins []string, fee []string, pr
 	d.Signature, _ = utils.MultiSignature(privs, msg)
 	b, _ := json.Marshal(d)
 	resp := app.DeliverTx(b)
+	assert.Equal(t, models.CodeTypeOK, resp.Code)
+}
+
+func receivedFee(t *testing.T, app *TMApplication, inflatorKp *key.Pair, inflatorPubHex string, coins, fee []string) {
+	msg, _ := json.Marshal(coins)
+	hash := sha256.Sum256(msg)
+	hashHex := hex.EncodeToString(hash[:])
+
+	d := models.Delivery{}
+	d.Type = models.RETRIEVE_FEE
+	data := models.RetrieveData{}
+	data.TransactionHash = hashHex
+	data.NewOwners = map[string]string{}
+	privs := []kyber.Scalar{inflatorKp.Private}
+	for _, v := range fee {
+		newOwnerPk, newOwnerPubHex := utils.CreateKeyPair()
+		data.NewOwners[v] = newOwnerPubHex
+		privs = append(privs, newOwnerPk.Private)
+	}
+	data.Inflator = inflatorPubHex
+	dataB, _ := json.Marshal(data)
+	d.Signature, _ = utils.MultiSignature(privs, dataB)
+	d.Data = data
+	b, _ := json.Marshal(d)
+	resp := app.DeliverTx(b)
+
 	assert.Equal(t, models.CodeTypeOK, resp.Code)
 }

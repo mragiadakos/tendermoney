@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"strings"
 
 	"github.com/mragiadakos/tendermoney/server/ctrls/models"
 )
@@ -71,4 +72,21 @@ func (s *State) FeeRetrievedFromTransaction(hash string) error {
 	stb, _ := json.Marshal(st)
 	s.db.Set(prefixTransaction(hash), stb)
 	return nil
+}
+
+func (s *State) GetTransactions() []StateTransaction {
+	iter := s.db.Iterator(nil, nil)
+	sts := []StateTransaction{}
+	for {
+		if !iter.Valid() {
+			break
+		}
+		if strings.HasPrefix(string(iter.Key()), string(transactionKey)) {
+			st := StateTransaction{}
+			json.Unmarshal(iter.Value(), &st)
+			sts = append(sts, st)
+		}
+		iter.Next()
+	}
+	return sts
 }
