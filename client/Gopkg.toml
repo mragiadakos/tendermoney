@@ -25,30 +25,38 @@
 #   unused-packages = true
 
 
-[[constraint]]
-  branch = "master"
-  name = "github.com/dedis/kyber"
-
-
-[[constraint]]
-  name = "github.com/ipfs/go-ipfs-api"
-  version = "1.2.7"
-
-[[constraint]]
-  name = "github.com/satori/go.uuid"
-  version = "1.2.0"
-
-[[constraint]]
-  name = "github.com/stretchr/testify"
-  version = "1.2.2"
-
-[[constraint]]
-  name = "github.com/tendermint/tmlibs"
-
-[[override]]
-  name = "github.com/tendermint/abci"
-  version = "=v0.11.0"
-
 [prune]
   go-tests = true
   unused-packages = true
+
+[[override]]
+  name = "github.com/ipfs/go-ipfs-api"
+  version = "1.2.7"
+
+[[override]]
+  branch = "master"
+  name = "github.com/dedis/kyber"
+
+[[override]]
+  name = "github.com/tendermint/tmlibs"
+  version = "=0.9.0"
+
+[[override]]
+  name = "google.golang.org/genproto"
+  revision = "7fd901a49ba6a7f87732eb344f6e3c5b19d1b200" 
+
+[[override]]
+  name = "github.com/tendermint/go-amino"
+  version = "=0.9.9"
+
+[[override]]
+  name = "github.com/tendermint/tendermint"
+  revision = "8412b75b1070ac023405e8228e017ed36531fe1b"
+
+[[override]]
+  name = "github.com/golang/protobuf"
+  version = "~1.0.0"
+
+[[override]]
+  name = "github.com/urfave/cli"
+  version = "1.20.0"

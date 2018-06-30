@@ -69,9 +69,8 @@ func (app *TMApplication) CheckTx(tx []byte) types.ResponseCheckTx {
 		}
 
 	default:
-		if err != nil {
-			return types.ResponseCheckTx{Code: models.CodeTypeUnauthorized, Log: "This type of action does not exists."}
-		}
+		return types.ResponseCheckTx{Code: models.CodeTypeUnauthorized, Log: "This type of action does not exists."}
+
 	}
 	return types.ResponseCheckTx{Code: models.CodeTypeOK}
 }

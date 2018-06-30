@@ -10,7 +10,7 @@ const (
 	INFLATE      = DeliveryType("inflate")
 	SUM          = DeliveryType("sum")
 	TAX          = DeliveryType("tax")
-	DIVIDE       = DeliveryType("devide")
+	DIVIDE       = DeliveryType("divide")
 	SEND         = DeliveryType("send")
 	RECEIVE      = DeliveryType("receive")
 	RETRIEVE_FEE = DeliveryType("retrieve_fee")

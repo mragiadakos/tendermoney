@@ -5,3 +5,5 @@ server/server
 client/client
 client/*.json
 client/vendor/*
+client/vault/*
+client/vaultTax/*

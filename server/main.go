@@ -18,7 +18,7 @@ func main() {
 	logger := tmlog.NewTMLogger(kitlog.NewSyncWriter(os.Stdout))
 	flagAbci := "socket"
 	ipfsDaemon := flag.String("ipfs", "127.0.0.1:5001", "the URL for the IPFS's daemon")
-	node := flag.String("node", "tcp://0.0.0.0:46658", "the TCP URL for the ABCI daemon")
+	node := flag.String("node", "tcp://0.0.0.0:26658", "the TCP URL for the ABCI daemon")
 	inflatorsHash := flag.String("inflators", "", "the IPFS hash with the json for the inflators")
 	flag.Parse()
 

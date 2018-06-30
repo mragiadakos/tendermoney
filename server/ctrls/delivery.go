@@ -155,9 +155,8 @@ func (app *TMApplication) DeliverTx(tx []byte) types.ResponseDeliverTx {
 		}
 
 	default:
-		if err != nil {
-			return types.ResponseDeliverTx{Code: models.CodeTypeUnauthorized, Log: "This type of action does not exists."}
-		}
+		return types.ResponseDeliverTx{Code: models.CodeTypeUnauthorized, Log: "This type of action does not exists."}
+
 	}
 	return types.ResponseDeliverTx{Code: models.CodeTypeOK}
 }
