@@ -5,8 +5,8 @@ import (
 	"errors"
 	"net/url"
 
-	"github.com/mragiadakos/tendermoney/server/ctrls/models"
-	"github.com/mragiadakos/tendermoney/server/ctrls/query"
+	"github.com/mragiadakos/tendermoney/app/ctrls/models"
+	"github.com/mragiadakos/tendermoney/app/ctrls/query"
 	"github.com/tendermint/abci/types"
 )
 

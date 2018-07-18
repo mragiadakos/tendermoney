@@ -7,7 +7,7 @@ import (
 	"errors"
 	"net/url"
 
-	"github.com/mragiadakos/tendermoney/server/ctrls/dbpkg"
+	"github.com/mragiadakos/tendermoney/app/ctrls/dbpkg"
 )
 
 type QueryModelTransaction struct {

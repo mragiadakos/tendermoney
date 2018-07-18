@@ -1,7 +1,7 @@
 package ctrls
 
 import (
-	"github.com/mragiadakos/tendermoney/server/ctrls/dbpkg"
+	"github.com/mragiadakos/tendermoney/app/ctrls/dbpkg"
 	"github.com/tendermint/abci/types"
 	dbm "github.com/tendermint/tmlibs/db"
 )

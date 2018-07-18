@@ -1,6 +1,6 @@
 package models
 
-import "github.com/mragiadakos/tendermoney/server/ctrls/utils"
+import "github.com/mragiadakos/tendermoney/app/ctrls/utils"
 
 type TaxData struct {
 	Percentage int

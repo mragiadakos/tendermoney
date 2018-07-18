@@ -7,7 +7,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/mragiadakos/tendermoney/server/ctrls/models"
+	"github.com/mragiadakos/tendermoney/app/ctrls/models"
 )
 
 var (

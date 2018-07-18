@@ -11,14 +11,13 @@ import (
 	"github.com/dedis/kyber/group/edwards25519"
 	"github.com/dedis/kyber/proof/dleq"
 	"github.com/dedis/kyber/util/random"
+	uuid "github.com/satori/go.uuid"
 
-	"github.com/satori/go.uuid"
-
-	"github.com/mragiadakos/tendermoney/server/confs"
-	"github.com/mragiadakos/tendermoney/server/ctrls/dbpkg"
-	"github.com/mragiadakos/tendermoney/server/ctrls/models"
-	"github.com/mragiadakos/tendermoney/server/ctrls/utils"
-	"github.com/mragiadakos/tendermoney/server/ctrls/validations"
+	"github.com/mragiadakos/tendermoney/app/confs"
+	"github.com/mragiadakos/tendermoney/app/ctrls/dbpkg"
+	"github.com/mragiadakos/tendermoney/app/ctrls/models"
+	"github.com/mragiadakos/tendermoney/app/ctrls/utils"
+	"github.com/mragiadakos/tendermoney/app/ctrls/validations"
 	"github.com/stretchr/testify/assert"
 )
 

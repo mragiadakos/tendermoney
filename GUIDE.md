@@ -15,7 +15,7 @@ $ cat inflator.json
 
 - We will add the inflator's key in another file. 
   The file will contain the list of inflators in a json format and put it near the validator.
-$ echo '["98cd0a61bcd7336f9f60ded6b04ec8714b3b860c52e56125fa6c71eb63ec7b32"]' > ../server/inflators.json
+$ echo '["98cd0a61bcd7336f9f60ded6b04ec8714b3b860c52e56125fa6c71eb63ec7b32"]' > ../app/inflators.json
 
 - Before using the inflators.json from the validator, we need to create an IPFS hash
 $ ipfs add inflators.json 

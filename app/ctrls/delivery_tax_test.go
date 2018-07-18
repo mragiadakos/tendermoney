@@ -5,10 +5,10 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/mragiadakos/tendermoney/server/confs"
-	"github.com/mragiadakos/tendermoney/server/ctrls/models"
-	"github.com/mragiadakos/tendermoney/server/ctrls/utils"
-	"github.com/mragiadakos/tendermoney/server/ctrls/validations"
+	"github.com/mragiadakos/tendermoney/app/confs"
+	"github.com/mragiadakos/tendermoney/app/ctrls/models"
+	"github.com/mragiadakos/tendermoney/app/ctrls/utils"
+	"github.com/mragiadakos/tendermoney/app/ctrls/validations"
 
 	"github.com/stretchr/testify/assert"
 )

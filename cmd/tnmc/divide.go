@@ -6,12 +6,12 @@ import (
 	"errors"
 	"os"
 
-	"github.com/mragiadakos/tendermoney/server/ctrls/models"
+	"github.com/mragiadakos/tendermoney/app/ctrls/models"
+	uuid "github.com/satori/go.uuid"
 	client "github.com/tendermint/tendermint/rpc/client"
 	"github.com/tendermint/tendermint/types"
 
-	"github.com/mragiadakos/tendermoney/server/ctrls/utils"
-	"github.com/satori/go.uuid"
+	"github.com/mragiadakos/tendermoney/app/ctrls/utils"
 
 	"github.com/dedis/kyber"
 	"github.com/dedis/kyber/group/edwards25519"

@@ -4,10 +4,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 
-	"github.com/mragiadakos/tendermoney/server/ctrls/dbpkg"
+	"github.com/mragiadakos/tendermoney/app/ctrls/dbpkg"
 
-	"github.com/mragiadakos/tendermoney/server/ctrls/models"
-	"github.com/mragiadakos/tendermoney/server/ctrls/validations"
+	"github.com/mragiadakos/tendermoney/app/ctrls/models"
+	"github.com/mragiadakos/tendermoney/app/ctrls/validations"
 	"github.com/tendermint/abci/types"
 )
 
