@@ -1,9 +1,7 @@
-server/vendor/*
-server/*.json
-server/server
+cmd/tnmd/vendor/*
+cmd/tnmd/*.json
+cmd/tnmd/tnmd
 
-client/client
-client/*.json
-client/vendor/*
-client/vault/*
-client/vaultTax/*
+cmd/tnmc/tnmc
+cmd/tnmc/*.json
+cmd/tnmc/vendor/*
