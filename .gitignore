@@ -5,3 +5,4 @@ cmd/tnmd/tnmd
 cmd/tnmc/tnmc
 cmd/tnmc/*.json
 cmd/tnmc/vendor/*
+vendor/*
