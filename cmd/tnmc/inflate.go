@@ -8,8 +8,8 @@ import (
 
 	"github.com/dedis/kyber"
 	"github.com/dedis/kyber/group/edwards25519"
-	"github.com/mragiadakos/tendermoney/server/ctrls/models"
-	"github.com/mragiadakos/tendermoney/server/ctrls/utils"
+	"github.com/mragiadakos/tendermoney/app/ctrls/models"
+	"github.com/mragiadakos/tendermoney/app/ctrls/utils"
 	uuid "github.com/satori/go.uuid"
 	client "github.com/tendermint/tendermint/rpc/client"
 	"github.com/tendermint/tendermint/types"

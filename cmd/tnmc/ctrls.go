@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mragiadakos/tendermoney/server/ctrls/utils"
+	"github.com/mragiadakos/tendermoney/app/ctrls/utils"
 	"github.com/urfave/cli"
 )
 

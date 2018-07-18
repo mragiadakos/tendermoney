@@ -13,14 +13,14 @@ import (
 	client "github.com/tendermint/tendermint/rpc/client"
 	"github.com/tendermint/tendermint/types"
 
-	"github.com/mragiadakos/tendermoney/server/ctrls/query"
-	"github.com/mragiadakos/tendermoney/server/ctrls/utils"
+	"github.com/mragiadakos/tendermoney/app/ctrls/query"
+	"github.com/mragiadakos/tendermoney/app/ctrls/utils"
 
 	"github.com/dedis/kyber/group/edwards25519"
 	"github.com/dedis/kyber/proof/dleq"
 	"github.com/dedis/kyber/util/random"
 
-	"github.com/mragiadakos/tendermoney/server/ctrls/models"
+	"github.com/mragiadakos/tendermoney/app/ctrls/models"
 )
 
 func send(coins, fee []string, vault string) (string, string, error) {

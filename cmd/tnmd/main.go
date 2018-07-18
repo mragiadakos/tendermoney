@@ -7,8 +7,8 @@ import (
 	"os"
 
 	kitlog "github.com/go-kit/kit/log"
-	"github.com/mragiadakos/tendermoney/server/confs"
-	"github.com/mragiadakos/tendermoney/server/ctrls"
+	"github.com/mragiadakos/tendermoney/app/confs"
+	"github.com/mragiadakos/tendermoney/app/ctrls"
 	absrv "github.com/tendermint/abci/server"
 	cmn "github.com/tendermint/tmlibs/common"
 	tmlog "github.com/tendermint/tmlibs/log"

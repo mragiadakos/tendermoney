@@ -1,62 +1,57 @@
 package main
 
 import (
-	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
 
-	"github.com/dedis/kyber"
-	"github.com/mragiadakos/tendermoney/server/ctrls/utils"
+	"github.com/mragiadakos/tendermoney/app/ctrls/models"
+	"github.com/mragiadakos/tendermoney/app/ctrls/utils"
 	client "github.com/tendermint/tendermint/rpc/client"
 	"github.com/tendermint/tendermint/types"
 
-	"github.com/mragiadakos/tendermoney/server/ctrls/models"
+	"github.com/dedis/kyber"
+	"github.com/dedis/kyber/group/edwards25519"
 )
 
-func receive(vault, hash, secret string) ([]string, error) {
+func receiveFee(inflatorKpj KeyPairJson, vault, hash string) ([]string, error) {
+	suite := edwards25519.NewBlakeSHA256Ed25519()
+	inflatorPrivateKeyB, _ := hex.DecodeString(inflatorKpj.PrivateKey)
+	inflatorPrivateKey := suite.Scalar()
+	inflatorPrivateKey.UnmarshalBinary(inflatorPrivateKeyB)
+
 	qmt, err := getTransaction(hash)
 	if err != nil {
 		return nil, err
 	}
-	if qmt.IsCoinsReceived {
-		return nil, errors.New("Error: The coins has already been received.")
-	}
-
-	b, err := base64.RawStdEncoding.DecodeString(secret)
-	if err != nil {
-		return nil, errors.New("Error: The secret has problem with base64 encoding, " + err.Error())
-	}
-	pv := models.ProofVerification{}
-	err = json.Unmarshal(b, &pv)
-	if err != nil {
-		return nil, errors.New("Error: The secret has problem with json encoding, " + err.Error())
+	if qmt.IsFeeReceived {
+		return nil, errors.New("Error: The fee has already been received.")
 	}
 
 	newOwnerPubPerCoin := map[string]string{}
 	newOwnersPrivHexPerCoin := map[string]string{}
-	newOwnersPrivs := []kyber.Scalar{}
-	for _, coin := range qmt.Coins {
+	privs := []kyber.Scalar{inflatorPrivateKey}
+	for _, coin := range qmt.Fee {
 		newOwnerKp, newOwnerPubHex := utils.CreateKeyPair()
 		newOwnerPubPerCoin[coin] = newOwnerPubHex
 		privB, _ := newOwnerKp.Private.MarshalBinary()
 		newOwnerPrivHex := hex.EncodeToString(privB)
 		newOwnersPrivHexPerCoin[coin] = newOwnerPrivHex
-		newOwnersPrivs = append(newOwnersPrivs, newOwnerKp.Private)
+		privs = append(privs, newOwnerKp.Private)
 	}
 
-	data := models.ReceiveData{}
-	data.NewOwners = newOwnerPubPerCoin
+	data := models.RetrieveData{}
+	data.Inflator = inflatorKpj.PublicKey
 	data.TransactionHash = hash
-	data.ProofVerification = pv
+	data.NewOwners = newOwnerPubPerCoin
 
 	d := models.Delivery{}
-	d.Type = models.RECEIVE
+	d.Type = models.RETRIEVE_FEE
 	d.Data = data
 	msg, _ := json.Marshal(data)
-	d.Signature, _ = utils.MultiSignature(newOwnersPrivs, msg)
+	d.Signature, _ = utils.MultiSignature(privs, msg)
 
 	dB, _ := json.Marshal(d)
 	cli := client.NewHTTP(Confs.TendermintNode, "/websocket")
