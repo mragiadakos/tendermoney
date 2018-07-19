@@ -1,9 +1,10 @@
 package main
 
 import (
-	"errors"
+	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	kitlog "github.com/go-kit/kit/log"
@@ -19,18 +20,34 @@ func main() {
 	flagAbci := "socket"
 	ipfsDaemon := flag.String("ipfs", "127.0.0.1:5001", "the URL for the IPFS's daemon")
 	node := flag.String("node", "tcp://0.0.0.0:26658", "the TCP URL for the ABCI daemon")
-	inflatorsHash := flag.String("inflators", "", "the IPFS hash with the json for the inflators")
+	inflatorsHash := flag.String("inflators-hash", "", "the IPFS hash with the json for the inflators")
+	inflatorsFile := flag.String("inflators-file", "", "the file with json array of public keys")
 	flag.Parse()
 
-	if len(*inflatorsHash) == 0 {
-		fmt.Println("Error:", errors.New("The IPFS hash with the json for the inflators is missing"))
-		return
-	}
+	if len(*inflatorsHash) > 0 {
 
-	err := confs.Conf.SetInflatorsFromHash(*inflatorsHash)
-	if err != nil {
-		fmt.Println("Error:", err.Error())
-		return
+		err := confs.Conf.SetInflatorsFromHash(*inflatorsHash)
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			return
+		}
+	} else {
+		if len(*inflatorsFile) == 0 {
+			fmt.Println("Error: need the list of inflators to continue.")
+			return
+		}
+		b, err := ioutil.ReadFile(*inflatorsFile)
+		if err != nil {
+			fmt.Println("Error: the file " + *inflatorsFile + " has problem:" + err.Error())
+			return
+		}
+		arr := []string{}
+		err = json.Unmarshal(b, &arr)
+		if err != nil {
+			fmt.Println("Error: the file " + *inflatorsFile + " has problem with encoding:" + err.Error())
+			return
+		}
+		confs.Conf.Inflators = arr
 	}
 	confs.Conf.AbciDaemon = *node
 	confs.Conf.IpfsConnection = *ipfsDaemon
