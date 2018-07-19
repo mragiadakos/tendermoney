@@ -26,7 +26,7 @@ func TestQueryCoinFailOnNotFound(t *testing.T) {
 
 	qreq := types.RequestQuery{}
 	uuid := uuid.NewV4().String()
-	qreq.Path = "get_coin?coin=" + uuid
+	qreq.Path = QUERY_GET_COIN + "?coin=" + uuid
 
 	resp := app.Query(qreq)
 	assert.Equal(t, models.CodeTypeUnauthorized, resp.Code)
@@ -37,7 +37,7 @@ func TestQueryCoinFailOnCoinNotSubmitted(t *testing.T) {
 	app := NewTMApplication()
 
 	qreq := types.RequestQuery{}
-	qreq.Path = "get_coin"
+	qreq.Path = QUERY_GET_COIN
 	resp := app.Query(qreq)
 	assert.Equal(t, models.CodeTypeUnauthorized, resp.Code)
 	assert.Equal(t, query.ERR_COIN_HAS_NOT_BEEN_SUBMITTED, errors.New(resp.Log))
@@ -52,7 +52,7 @@ func TestQueryCoinSuccess(t *testing.T) {
 	coin, coinKp := newCoin(t, app, inflatorKp, inflatorPubHex, 0.50)
 
 	qreq := types.RequestQuery{}
-	qreq.Path = "get_coin?coin=" + coin
+	qreq.Path = QUERY_GET_COIN + "?coin=" + coin
 	resp := app.Query(qreq)
 	assert.Equal(t, models.CodeTypeOK, resp.Code)
 	qmc := query.QueryModelCoin{}
@@ -70,7 +70,7 @@ func TestQueryCoinByOwnerFailPublicIsEmpty(t *testing.T) {
 	app := NewTMApplication()
 
 	qreq := types.RequestQuery{}
-	qreq.Path = "get_coin_by_owner"
+	qreq.Path = QUERY_GET_COIN_BY_OWNER
 	resp := app.Query(qreq)
 	assert.Equal(t, models.CodeTypeUnauthorized, resp.Code)
 	assert.Equal(t, query.ERR_OWNER_HAS_NOT_BEEN_SUBMITTED, errors.New(resp.Log))
@@ -81,7 +81,7 @@ func TestQueryCoinByOwnerFailPublicIsNotFound(t *testing.T) {
 
 	qreq := types.RequestQuery{}
 	owner := "blalalla"
-	qreq.Path = "get_coin_by_owner?owner=" + owner
+	qreq.Path = QUERY_GET_COIN_BY_OWNER + "?owner=" + owner
 	resp := app.Query(qreq)
 	assert.Equal(t, models.CodeTypeUnauthorized, resp.Code)
 	assert.Equal(t, query.ERR_OWNER_HAS_NOT_BEEN_FOUND(owner), errors.New(resp.Log))
@@ -99,7 +99,7 @@ func TestQueryCoinByOwnerSuccessful(t *testing.T) {
 	ownerPubHex := hex.EncodeToString(pub)
 
 	qreq := types.RequestQuery{}
-	qreq.Path = "get_coin_by_owner?owner=" + ownerPubHex
+	qreq.Path = QUERY_GET_COIN_BY_OWNER + "?owner=" + ownerPubHex
 	resp := app.Query(qreq)
 	assert.Equal(t, models.CodeTypeOK, resp.Code)
 
@@ -114,7 +114,7 @@ func TestQueryCoinByOwnerSuccessful(t *testing.T) {
 func TestQueryTaxFailOnNoTaxes(t *testing.T) {
 	app := NewTMApplication()
 	qreq := types.RequestQuery{}
-	qreq.Path = "get_latest_tax"
+	qreq.Path = QUERY_GET_LATEST_TAX
 	resp := app.Query(qreq)
 	assert.Equal(t, models.CodeTypeUnauthorized, resp.Code)
 	assert.Equal(t, query.ERR_THERE_NO_TAXES, errors.New(resp.Log))
@@ -131,7 +131,7 @@ func TestQueryTaxSuccess(t *testing.T) {
 	createTax(t, app, inflatorKp, inflatorPubHex, 2)
 
 	qreq := types.RequestQuery{}
-	qreq.Path = "get_latest_tax"
+	qreq.Path = QUERY_GET_LATEST_TAX
 	resp := app.Query(qreq)
 	assert.Equal(t, models.CodeTypeOK, resp.Code)
 
@@ -144,7 +144,7 @@ func TestQueryTaxSuccess(t *testing.T) {
 func TestQueryTransactionFailOnHashIsEmpty(t *testing.T) {
 	app := NewTMApplication()
 	qreq := types.RequestQuery{}
-	qreq.Path = "get_transaction"
+	qreq.Path = QUERY_GET_TRANSACTION
 	resp := app.Query(qreq)
 	assert.Equal(t, models.CodeTypeUnauthorized, resp.Code)
 	assert.Equal(t, query.ERR_TRANSACTION_HAS_NOT_BEEN_SUBMITTED, errors.New(resp.Log))
@@ -154,7 +154,7 @@ func TestQueryTransactionFailOnHashNotFound(t *testing.T) {
 	app := NewTMApplication()
 	qreq := types.RequestQuery{}
 	hash := "blblblblblb"
-	qreq.Path = "get_transaction?hash=" + hash
+	qreq.Path = QUERY_GET_TRANSACTION + "?hash=" + hash
 	resp := app.Query(qreq)
 	assert.Equal(t, models.CodeTypeUnauthorized, resp.Code)
 	assert.Equal(t, query.ERR_TRANSACTION_HAS_NOT_BEEN_FOUND(hash), errors.New(resp.Log))
@@ -186,7 +186,7 @@ func TestQueryTransactionSuccess(t *testing.T) {
 	hashHex := hex.EncodeToString(hash[:])
 
 	qreq := types.RequestQuery{}
-	qreq.Path = "get_transaction?hash=" + hashHex
+	qreq.Path = QUERY_GET_TRANSACTION + "?hash=" + hashHex
 	resp := app.Query(qreq)
 	assert.Equal(t, models.CodeTypeOK, resp.Code)
 
@@ -228,7 +228,7 @@ func TestGetUnreceivedFeeTransactionsSuccess(t *testing.T) {
 	}
 
 	qreq := types.RequestQuery{}
-	qreq.Path = "get_transactions_with_unreceived_fee"
+	qreq.Path = QUERY_GET_TRANSACTION_WITH_UNRECEIVED_FEE
 	resp := app.Query(qreq)
 	assert.Equal(t, models.CodeTypeOK, resp.Code)
 
