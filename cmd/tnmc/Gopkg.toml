@@ -47,7 +47,7 @@
 
 [[override]]
   name = "github.com/tendermint/go-amino"
-  version = "=0.9.9"
+  version = "=v0.10.1"
 
 [[override]]
   name = "github.com/tendermint/tendermint"

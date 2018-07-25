@@ -1,5 +1,9 @@
 package main
 
+import (
+	"os"
+)
+
 type configurations struct {
 	TendermintNode string
 }
@@ -7,5 +11,10 @@ type configurations struct {
 var Confs = configurations{}
 
 func init() {
-	Confs.TendermintNode = "tcp://localhost:26657"
+	node := os.Getenv("NODE")
+	if len(node) > 0 {
+		Confs.TendermintNode = node
+	} else {
+		Confs.TendermintNode = "tcp://localhost:26657"
+	}
 }

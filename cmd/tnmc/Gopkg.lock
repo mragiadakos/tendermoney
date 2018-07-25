@@ -11,7 +11,7 @@
   branch = "master"
   name = "github.com/btcsuite/btcd"
   packages = ["btcec"]
-  revision = "f673a4b563b57b9a95832545c878669a7fa801d9"
+  revision = "9a2f9524024889e129a5422aca2cff73cb3eabf6"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -39,7 +39,7 @@
     "util/random",
     "xof/blake2xb"
   ]
-  revision = "3f3297a947037249232843f6faa3d8e046d2d0e8"
+  revision = "4b882c2d31af928e7b449e0be8b27b573c2da82d"
 
 [[projects]]
   branch = "master"
@@ -137,7 +137,7 @@
     "app/ctrls/query",
     "app/ctrls/utils"
   ]
-  revision = "a0633451ef3e8ada1d5763dd234a46c2093dd84f"
+  revision = "8288750c2a885b2ac23b4e975e744ca42afdc4c4"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -179,7 +179,7 @@
     "nfs",
     "xfs"
   ]
-  revision = "ae68e2d4c00fed4943b5f6698d504a5fe083da8a"
+  revision = "05ee40e3a273f7245e8777337fc7b46e533a9a92"
 
 [[projects]]
   branch = "master"
@@ -225,8 +225,8 @@
 [[projects]]
   name = "github.com/tendermint/go-amino"
   packages = ["."]
-  revision = "ed62928576cfcaf887209dc96142cd79cdfff389"
-  version = "0.9.9"
+  revision = "2106ca61d91029c931fd54968c2bb02dc96b1412"
+  version = "0.10.1"
 
 [[projects]]
   name = "github.com/tendermint/tendermint"
@@ -306,7 +306,7 @@
     "ripemd160",
     "salsa20/salsa"
   ]
-  revision = "a2144134853fc9a27a7b1e3eb4f19f1a76df13c9"
+  revision = "c126467f60eb25f8f27e5a981f32a87e3965053f"
 
 [[projects]]
   branch = "master"
@@ -321,13 +321,13 @@
     "netutil",
     "trace"
   ]
-  revision = "d0887baf81f4598189d4e12a37c6da86f0bba4d0"
+  revision = "3673e40ba22529d22c3fd7c93e97b0ce50fa7bdd"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["cpu"]
-  revision = "ac767d655b305d4e9612f5f6e33120b9176c4ad4"
+  revision = "e072cadbbdc8dd3d3ffa82b8b4b9304c261d9311"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -382,6 +382,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "68601983aee9d94610a86c35d3d3a658adeff00a1f3191551576d32dacca8252"
+  inputs-digest = "2fd454432ea8945544d88a90b06d42ca28bec68a88f467f24757854537f30298"
   solver-name = "gps-cdcl"
   solver-version = 1
